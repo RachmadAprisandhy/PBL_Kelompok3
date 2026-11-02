@@ -20,9 +20,10 @@ class _ResultScreenState extends State<ResultScreen> {
     setState(() => _saving = true);
     try {
       await AppDatabase.instance.insertResult(GradingResult(
+        id: '',
         imagePath: widget.imagePath,
-        grade: 'A',
-        confidence: 92.6,
+        ripenessLevel: 'Grade A',
+        confidence: 0.926,
         createdAt: DateTime.now(),
         note: 'Kualitas visual baik (hasil simulasi; CNN belum terhubung).',
       ));
