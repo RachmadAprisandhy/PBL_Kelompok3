@@ -1,0 +1,80 @@
+{
+  "model": "C:\\Users\\USER\\Downloads\\PBL Kelompok 3\\PBL_Kelompok3\\models\\banana_cnn_drive.keras",
+  "test_dir": "G:\\.shortcut-targets-by-id\\1AI7SzEx1Y6mTJAbThxljTH7OK8BntuUO\\Banana Images\\Synthetic Dataset\\test",
+  "class_names": [
+    "Grade A",
+    "Grade B",
+    "Grade C",
+    "Grade D"
+  ],
+  "image_size": [
+    224,
+    224
+  ],
+  "batch_size": 16,
+  "test_images": 2001,
+  "loss": 0.7194390296936035,
+  "accuracy": 0.7056471705436707,
+  "per_class": {
+    "Grade A": {
+      "precision": 0.8942652329749103,
+      "recall": 0.998,
+      "f1_score": 0.9432892249527409,
+      "support": 500
+    },
+    "Grade B": {
+      "precision": 0.8550106609808102,
+      "recall": 0.802,
+      "f1_score": 0.8276573787409702,
+      "support": 500
+    },
+    "Grade C": {
+      "precision": 0.5224191866527633,
+      "recall": 1.0,
+      "f1_score": 0.6863013698630138,
+      "support": 501
+    },
+    "Grade D": {
+      "precision": 0.7333333333333333,
+      "recall": 0.022,
+      "f1_score": 0.04271844660194175,
+      "support": 500
+    }
+  },
+  "macro_average": {
+    "precision": 0.7512571034854543,
+    "recall": 0.7054999999999999,
+    "f1_score": 0.6249916050396667
+  },
+  "weighted_average": {
+    "precision": 0.7511427417079267,
+    "recall": 0.7056471764117941,
+    "f1_score": 0.625022244602297
+  },
+  "confusion_matrix": [
+    [
+      499,
+      1,
+      0,
+      0
+    ],
+    [
+      1,
+      401,
+      94,
+      4
+    ],
+    [
+      0,
+      0,
+      501,
+      0
+    ],
+    [
+      58,
+      67,
+      364,
+      11
+    ]
+  ]
+}

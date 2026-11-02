@@ -55,3 +55,6 @@ __pycache__/
 
 # Machine Learning dataset
 dataset/
+
+.venv/
+.venv311/
