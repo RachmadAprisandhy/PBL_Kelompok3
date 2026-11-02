@@ -36,7 +36,6 @@ class _DetectionScreenState extends State<DetectionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Kategori Grade
             const Text(
               'Kategori Grade',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.text),
@@ -51,8 +50,6 @@ class _DetectionScreenState extends State<DetectionScreen> {
               ],
             ),
             const SizedBox(height: 24),
-
-            // Area Preview Foto Terpilih
             Container(
               height: 320,
               decoration: BoxDecoration(
@@ -68,9 +65,7 @@ class _DetectionScreenState extends State<DetectionScreen> {
                         fit: BoxFit.cover,
                         width: double.infinity,
                         errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Text('Gagal memuat file gambar'),
-                          );
+                          return const Center(child: Text('Gagal memuat file gambar'));
                         },
                       ),
                     )
@@ -87,8 +82,6 @@ class _DetectionScreenState extends State<DetectionScreen> {
                     ),
             ),
             const SizedBox(height: 32),
-
-            // Tombol Utama: Analisis Grading -> ResultScreen
             ElevatedButton(
               onPressed: _selectedImage == null
                   ? null
@@ -96,7 +89,11 @@ class _DetectionScreenState extends State<DetectionScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ResultScreen(imagePath: _selectedImage!.path),
+                          builder: (context) => ResultScreen(
+                            imagePath: _selectedImage!.path,
+                            ripenessLevel: 'Grade A', // Hasil simulasi model CNN
+                            confidence: 0.925,        // Akurasi simulasi
+                          ),
                         ),
                       );
                     },
@@ -123,7 +120,6 @@ class _DetectionScreenState extends State<DetectionScreen> {
     );
   }
 
-  // Widget Kartu Kategori Grade
   Widget _buildGradeCard(String title, String subtitle, Color bgColor, Color textColor) {
     return Expanded(
       child: Container(
