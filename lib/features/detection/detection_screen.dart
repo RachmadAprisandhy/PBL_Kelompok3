@@ -1,7 +1,8 @@
-
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../grading/services/grading_api.dart';
 import 'result_screen.dart';
@@ -36,20 +37,15 @@ class _DetectionScreenState extends State<DetectionScreen> {
 
     try {
       // Mengirim gambar ke FastAPI
-      final result = await _gradingApi.predict(
-        _selectedImage!.path,
-      );
+      final result = await _gradingApi.predict(_selectedImage!.path);
 
       // Mengambil hasil prediksi
       final String grade = result['predicted_grade'].toString();
 
-      final probabilities = Map<String, dynamic>.from(
-        result['probabilities'],
-      );
+      final probabilities = Map<String, dynamic>.from(result['probabilities']);
 
       // Mengambil probabilitas tertinggi
-      final double confidence =
-          (probabilities[grade] as num).toDouble() / 100;
+      final double confidence = (probabilities[grade] as num).toDouble() / 100;
 
       if (!mounted) return;
 
@@ -65,10 +61,10 @@ class _DetectionScreenState extends State<DetectionScreen> {
             imagePath: _selectedImage!.path,
             ripenessLevel: grade,
             confidence: confidence,
+            probabilities: probabilities,
           ),
         ),
       );
-
     } catch (e) {
       if (!mounted) return;
 
@@ -148,10 +144,7 @@ class _DetectionScreenState extends State<DetectionScreen> {
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1.5,
-                ),
+                border: Border.all(color: Colors.grey.shade300, width: 1.5),
               ),
               child: _selectedImage != null
                   ? ClipRRect(
@@ -278,10 +271,7 @@ class _DetectionScreenState extends State<DetectionScreen> {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 9,
-                color: AppColors.muted,
-              ),
+              style: const TextStyle(fontSize: 9, color: AppColors.muted),
               textAlign: TextAlign.center,
             ),
           ],
