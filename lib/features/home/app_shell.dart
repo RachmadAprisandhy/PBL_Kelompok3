@@ -10,9 +10,9 @@ import '../detection/detection_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({
-    Key? key,
+    super.key,
     this.showTutorialOnInit = true,
-  }) : super(key: key);
+  });
 
   final bool showTutorialOnInit;
 

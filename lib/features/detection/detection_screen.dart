@@ -8,7 +8,7 @@ import '../grading/services/grading_api.dart';
 import 'result_screen.dart';
 
 class DetectionScreen extends StatefulWidget {
-  const DetectionScreen({Key? key, this.initialImage}) : super(key: key);
+  const DetectionScreen({super.key, this.initialImage});
 
   final XFile? initialImage;
 

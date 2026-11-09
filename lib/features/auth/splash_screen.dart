@@ -103,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 600),
-        pageBuilder: (_, animation, __) => FadeTransition(
+        pageBuilder: (_, animation, _) => FadeTransition(
           opacity: animation,
           child: const AppShell(showTutorialOnInit: true),
         ),
@@ -148,12 +148,12 @@ class _SplashScreenState extends State<SplashScreen>
                     Positioned(
                       top: 60 + dy,
                       left: -25,
-                      child: _buildBgCircle(130, AppColors.lime.withOpacity(0.18)),
+                      child: _buildBgCircle(130, AppColors.lime.withValues(alpha: 0.18)),
                     ),
                     Positioned(
                       bottom: 110 - dy,
                       right: -35,
-                      child: _buildBgCircle(160, AppColors.yellow.withOpacity(0.22)),
+                      child: _buildBgCircle(160, AppColors.yellow.withValues(alpha: 0.22)),
                     ),
                     Positioned(
                       top: 110 - dy * 0.7,
@@ -209,8 +209,8 @@ class _SplashScreenState extends State<SplashScreen>
                                     height: 148,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: AppColors.yellow.withOpacity(
-                                        0.22 * (1 - _pulseController.value * 0.4),
+                                      color: AppColors.yellow.withValues(
+                                        alpha: 0.22 * (1 - _pulseController.value * 0.4),
                                       ),
                                     ),
                                   ),
@@ -222,7 +222,7 @@ class _SplashScreenState extends State<SplashScreen>
                                     height: 118,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: AppColors.green.withOpacity(0.08),
+                                      color: AppColors.green.withValues(alpha: 0.08),
                                     ),
                                   ),
                                 ),
@@ -261,7 +261,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.85),
                                 borderRadius: BorderRadius.circular(30),
                                 border: Border.all(color: AppColors.border),
                               ),

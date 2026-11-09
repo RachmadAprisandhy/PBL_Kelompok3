@@ -1,0 +1,18 @@
+[
+  "Texture_contrast_0",
+  "Texture_homogeneity_0",
+  "Texture_contrast_45",
+  "Texture_homogeneity_45",
+  "Texture_contrast_90",
+  "Texture_homogeneity_90",
+  "Texture_contrast_135",
+  "Texture_homogeneity_135",
+  "Texture_energy_mean",
+  "Texture_correlation_mean",
+  "H_mean",
+  "H_std",
+  "S_mean",
+  "V_mean",
+  "Shape_aspect_ratio",
+  "Shape_solidity"
+]

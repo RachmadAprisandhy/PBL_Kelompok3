@@ -144,7 +144,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                               color: (isSelected
                                       ? AppColors.yellow
                                       : Colors.white)
-                                  .withOpacity(0.35 * (1 - _pulseController.value * 0.5)),
+                                  .withValues(alpha: 0.35 * (1 - _pulseController.value * 0.5)),
                             ),
                           ),
                         ),
@@ -216,7 +216,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.96),
+                      color: Colors.white.withValues(alpha: 0.96),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.green, width: 1.5),
                       boxShadow: const [
@@ -289,7 +289,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.65),
+                      color: Colors.black.withValues(alpha: 0.65),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Row(
@@ -315,7 +315,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                   const Spacer(),
                   TextButton.icon(
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.92),
+                      backgroundColor: Colors.white.withValues(alpha: 0.92),
                       foregroundColor: AppColors.darkGreen,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -345,7 +345,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                   const SizedBox(width: 8),
                   IconButton(
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.black.withOpacity(0.65),
+                      backgroundColor: Colors.black.withValues(alpha: 0.65),
                       foregroundColor: Colors.white,
                     ),
                     onPressed: widget.onFinish,
@@ -536,7 +536,7 @@ class _SpotlightPainter extends CustomPainter {
     if (targetRect == null) {
       canvas.drawPath(
         fullPath,
-        Paint()..color = Colors.black.withOpacity(0.55),
+        Paint()..color = Colors.black.withValues(alpha: 0.55),
       );
       return;
     }
@@ -564,7 +564,7 @@ class _SpotlightPainter extends CustomPainter {
 
     canvas.drawPath(
       overlayPath,
-      Paint()..color = Colors.black.withOpacity(0.62),
+      Paint()..color = Colors.black.withValues(alpha: 0.62),
     );
 
     final borderPaint = Paint()

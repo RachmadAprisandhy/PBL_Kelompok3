@@ -1,6 +1,7 @@
 # IMPORT LIBRARY DAN KONFIGURASI
 
 import os
+import json
 import cv2
 import joblib
 import numpy as np
@@ -13,8 +14,8 @@ from skimage.feature import graycoprops
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-MODEL_PATH = os.path.join(BASE_DIR, "random_forest_model.pkl")
-FEATURE_PATH = os.path.join(BASE_DIR, "feature_random_forest.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "random_forest_texture_1042_full.pkl")
+FEATURE_PATH = os.path.join(BASE_DIR, "feature_random_forest_texture_1042_full.json")
 CLASS_PATH = os.path.join(BASE_DIR, "class_random_forest.pkl")
 
 IMG_SIZE = (224, 224)
@@ -23,7 +24,8 @@ KERNEL = np.ones((5, 5), np.uint8)
 
 # Memuat model dan informasi fitur
 model = joblib.load(MODEL_PATH)
-feature_names = joblib.load(FEATURE_PATH)
+with open(FEATURE_PATH, "r", encoding="utf-8") as feature_file:
+    feature_names = json.load(feature_file)
 class_names = joblib.load(CLASS_PATH)
 
 # Validasi model dan fitur
@@ -230,31 +232,85 @@ def extract_texture_features(image, mask):
 
     return texture_features
 
-# MENGGABUNGKAN FITUR WARNA DAN TEKSTUR
+# EKSTRAKSI 16 FITUR MODEL TEKSTUR 10 / WARNA 4 / BENTUK 2
+
+TEXTURE_OFFSETS = [(0, 1), (-1, 1), (-1, 0), (-1, -1)]
+
 
 def extract_all_features(image):
-
-    # Preprocessing dan segmentasi
     processed_image, mask = preprocess_image(image)
+    gray = cv2.cvtColor(processed_image, cv2.COLOR_BGR2GRAY)
+    quantized = (gray // 32).astype(np.uint8)
+    object_mask = mask == 255
+    height, width = gray.shape
 
-    # Ekstraksi fitur warna
-    color_features = extract_color_features(
-        processed_image,
-        mask
+    # 8 fitur tekstur: contrast dan homogeneity untuk empat arah.
+    directional_features = []
+    summary_glcm = np.zeros((8, 8, 1, 4), dtype=np.float64)
+    for i, (dy, dx) in enumerate(TEXTURE_OFFSETS):
+        y1, y2 = max(0, -dy), min(height, height - dy)
+        x1, x2 = max(0, -dx), min(width, width - dx)
+        source = quantized[y1:y2, x1:x2]
+        target = quantized[y1 + dy:y2 + dy, x1 + dx:x2 + dx]
+        valid = (
+            object_mask[y1:y2, x1:x2]
+            & object_mask[y1 + dy:y2 + dy, x1 + dx:x2 + dx]
+        )
+        glcm = np.zeros((8, 8), dtype=np.float64)
+        np.add.at(glcm, (source[valid], target[valid]), 1)
+        glcm += glcm.T
+        total = glcm.sum()
+        if total:
+            glcm /= total
+            directional_glcm = glcm[:, :, None, None]
+            directional_features.extend([
+                float(graycoprops(directional_glcm, "contrast")[0, 0]),
+                float(graycoprops(directional_glcm, "homogeneity")[0, 0]),
+            ])
+        else:
+            directional_features.extend([0.0, 0.0])
+        summary_glcm[:, :, 0, i] = glcm
+
+    # 2 fitur tekstur tambahan: rata-rata energy dan correlation empat arah.
+    texture_summary = [
+        float(np.mean(graycoprops(summary_glcm, "energy"))),
+        float(np.mean(graycoprops(summary_glcm, "correlation"))),
+    ]
+
+    # 4 fitur warna: H_mean, H_std, S_mean, V_mean.
+    hsv = cv2.cvtColor(processed_image, cv2.COLOR_BGR2HSV)
+    object_hsv = hsv[mask == 255]
+    if not len(object_hsv):
+        raise ValueError("Tidak ditemukan piksel objek.")
+    color_features = [
+        float(np.mean(object_hsv[:, 0])),
+        float(np.std(object_hsv[:, 0])),
+        float(np.mean(object_hsv[:, 1])),
+        float(np.mean(object_hsv[:, 2])),
+    ]
+
+    # 2 fitur bentuk: aspect ratio dan solidity kontur terbesar.
+    contours, _ = cv2.findContours(
+        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
+    if contours:
+        contour = max(contours, key=cv2.contourArea)
+        area = float(cv2.contourArea(contour))
+        _, (rect_width, rect_height), _ = cv2.minAreaRect(contour)
+        aspect_ratio = max(rect_width, rect_height) / max(
+            min(rect_width, rect_height), 1e-6
+        )
+        hull_area = float(cv2.contourArea(cv2.convexHull(contour)))
+        solidity = area / hull_area if hull_area > 0 else 0.0
+        shape_features = [float(aspect_ratio), float(solidity)]
+    else:
+        shape_features = [0.0, 0.0]
 
-    # Ekstraksi fitur tekstur
-    texture_features = extract_texture_features(
-        processed_image,
-        mask
+    all_features = (
+        directional_features + texture_summary + color_features + shape_features
     )
-
-    # Gabungkan menjadi 16 fitur
-    all_features = color_features + texture_features
-
     if len(all_features) != 16:
-        raise ValueError("Jumlah fitur tidak sesuai!")
-
+        raise ValueError(f"Jumlah fitur harus 16, ditemukan {len(all_features)}.")
     return all_features
 
 # FUNGSI PREDIKSI RANDOM FOREST
