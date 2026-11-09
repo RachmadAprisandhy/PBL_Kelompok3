@@ -4,7 +4,7 @@ import 'package:path/path.dart' as p;
 
 class GradingApi {
   // Alamat FastAPI di laptop
-  static const String baseUrl = 'http://192.168.18.221:8000';
+  static const String baseUrl = 'http://192.168.66.21:8000';
 
   // Konfigurasi Dio
   final Dio _dio = Dio(
