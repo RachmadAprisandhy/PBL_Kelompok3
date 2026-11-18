@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'home_screen.dart';
-import 'tutorial_overlay.dart';
+import '../../data/local/app_database.dart';
+import '../detection/detection_screen.dart';
 import '../history/history_screen.dart';
 import '../info/info_screens.dart';
 import '../profile/profile_screen.dart';
-import '../detection/detection_screen.dart';
+import 'home_screen.dart';
+import 'tutorial_overlay.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({
@@ -36,7 +37,41 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
-    _showTutorial = widget.showTutorialOnInit;
+    _showTutorial = false;
+    _loadTutorialStatus();
+  }
+
+  // Periksa status tutorial yang tersimpan di database lokal.
+  Future<void> _loadTutorialStatus() async {
+    try {
+      final hasSeenTutorial =
+          await AppDatabase.instance.hasSeenHomeTutorial();
+
+      if (!mounted) return;
+      if (widget.showTutorialOnInit && !hasSeenTutorial) {
+        setState(() => _showTutorial = true);
+      }
+    } catch (e) {
+      debugPrint('Gagal membaca status tutorial: $e');
+
+      // Jika status gagal dibaca, tampilkan tutorial agar pengguna tetap
+      // mendapatkan petunjuk awal. Status akan dicoba disimpan saat ditutup.
+      if (mounted && widget.showTutorialOnInit) {
+        setState(() => _showTutorial = true);
+      }
+    }
+  }
+
+  // Simpan status tutorial ketika pengguna selesai, melewati, atau menutupnya.
+  Future<void> _finishTutorial() async {
+    try {
+      await AppDatabase.instance.markHomeTutorialAsSeen();
+    } catch (e) {
+      debugPrint('Gagal menyimpan status tutorial: $e');
+    }
+
+    if (!mounted) return;
+    setState(() => _showTutorial = false);
   }
 
   void _onTabTapped(int index) {
@@ -52,7 +87,10 @@ class _AppShellState extends State<AppShell> {
     });
   }
 
-  Future<void> _handlePickImage(BuildContext modalContext, ImageSource source) async {
+  Future<void> _handlePickImage(
+    BuildContext modalContext,
+    ImageSource source,
+  ) async {
     final navigator = Navigator.of(context);
     Navigator.of(modalContext).pop();
 
@@ -244,9 +282,7 @@ class _AppShellState extends State<AppShell> {
         if (_showTutorial && _currentIndex == 0)
           TutorialOverlay(
             targets: _tutorialTargets,
-            onFinish: () {
-              setState(() => _showTutorial = false);
-            },
+            onFinish: _finishTutorial,
           ),
       ],
     );

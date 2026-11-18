@@ -103,6 +103,10 @@ class _TutorialOverlayState extends State<TutorialOverlay>
 
           // 2. Lingkaran Kecil Berdenyut di SETIAP Fitur pada Halaman Utama
           ...List.generate(widget.targets.length, (index) {
+            // Pada mode Lihat Semua, nomor sudah ditampilkan di dalam daftar.
+            // Sembunyikan badge di atas halaman agar tidak bertumpuk dengan panel.
+            if (_showAllAtOnce) return const SizedBox.shrink();
+
             final item = widget.targets[index];
             final rect = _getTargetRect(item.key);
             if (rect == null) return const SizedBox.shrink();
@@ -188,90 +192,9 @@ class _TutorialOverlayState extends State<TutorialOverlay>
             );
           }),
 
-          // 3A. Mode "Lihat Semua": Tampilkan Teks Singkat di Setiap Fitur Sekaligus
-          if (_showAllAtOnce)
-            ...List.generate(widget.targets.length, (index) {
-              final item = widget.targets[index];
-              final rect = _getTargetRect(item.key);
-              if (rect == null) return const SizedBox.shrink();
-
-              final topPos = item.isCircleShape
-                  ? rect.top - 66
-                  : (rect.top + 16).clamp(70.0, screenSize.height - 130.0);
-
-              return Positioned(
-                left: 24,
-                right: 24,
-                top: topPos,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _showAllAtOnce = false;
-                      _activeIndex = index;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.96),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.green, width: 1.5),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 13,
-                          backgroundColor: AppColors.green,
-                          child: Text(
-                            '${item.number}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                item.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 12.5,
-                                  color: AppColors.darkGreen,
-                                ),
-                              ),
-                              Text(
-                                item.description,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.text,
-                                  height: 1.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
+          // 3A. Mode Lihat Semua: daftar petunjuk dalam satu panel yang bisa di-scroll.
+          // Setiap petunjuk berada pada barisnya sendiri sehingga tidak saling menimpa.
+          if (_showAllAtOnce) _buildAllTutorialPanel(context),
 
           // 3B. Mode Langkah: Tampilkan Balon Teks Singkat di Dekat Fitur yang Disorot
           if (!_showAllAtOnce && activeRect != null)
@@ -357,22 +280,208 @@ class _TutorialOverlayState extends State<TutorialOverlay>
             ),
           ),
 
-          if (_showAllAtOnce)
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: 24,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.yellow,
-                  foregroundColor: AppColors.darkGreen,
-                ),
-                onPressed: widget.onFinish,
-                icon: const Icon(Icons.check_circle_outline),
-                label: const Text('Mengerti, Mulai Gunakan Aplikasi'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAllTutorialPanel(BuildContext context) {
+    final systemPadding = MediaQuery.of(context).padding;
+
+    return Positioned(
+      left: 16,
+      right: 16,
+      top: systemPadding.top + 68,
+      // Sisakan ruang untuk navigasi bawah aplikasi dan navigasi sistem.
+      bottom: systemPadding.bottom + kBottomNavigationBarHeight + 12,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.98),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppColors.green.withValues(alpha: 0.75),
+            width: 1.4,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 14,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 15, 16, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Daftar Petunjuk Fitur',
+                          style: TextStyle(
+                            color: AppColors.darkGreen,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'Pilih petunjuk untuk melihat langkahnya.',
+                          style: TextStyle(
+                            color: AppColors.text.withValues(alpha: 0.75),
+                            fontSize: 11.5,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.green.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${widget.targets.length} fitur',
+                      style: const TextStyle(
+                        color: AppColors.darkGreen,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-        ],
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.green.withValues(alpha: 0.14),
+            ),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.all(12),
+                itemCount: widget.targets.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 9),
+                itemBuilder: (context, index) {
+                  final item = widget.targets[index];
+
+                  return Material(
+                    color: const Color(0xFFF7FAF8),
+                    borderRadius: BorderRadius.circular(13),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(13),
+                      onTap: () {
+                        setState(() {
+                          _showAllAtOnce = false;
+                          _activeIndex = index;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 11,
+                          vertical: 11,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(13),
+                          border: Border.all(
+                            color: AppColors.green.withValues(alpha: 0.16),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: AppColors.green,
+                              child: Text(
+                                '${item.number}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 11),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      color: AppColors.darkGreen,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    item.description,
+                                    style: const TextStyle(
+                                      color: AppColors.text,
+                                      fontSize: 11.5,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 7),
+                              child: Icon(
+                                Icons.chevron_right_rounded,
+                                color: AppColors.muted,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.yellow,
+                    foregroundColor: AppColors.darkGreen,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                  ),
+                  onPressed: widget.onFinish,
+                  icon: const Icon(Icons.check_circle_outline, size: 19),
+                  label: const Text(
+                    'Mengerti, Mulai Gunakan Aplikasi',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
