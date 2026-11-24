@@ -192,7 +192,7 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  // FITUR 2: Kategori Grade A, B, C
+                  // FITUR 2: Kategori Grade A, B, C, D (Grid 2x2)
                   Container(
                     key: gradeCategoryKey,
                     child: Column(
@@ -217,7 +217,7 @@ class HomeScreen extends StatelessWidget {
                                 emoji: '🍌',
                               ),
                             ),
-                            SizedBox(width: 10),
+                            SizedBox(width: 12),
                             Expanded(
                               child: _GradeCard(
                                 grade: 'B',
@@ -226,12 +226,25 @@ class HomeScreen extends StatelessWidget {
                                 emoji: '🍌',
                               ),
                             ),
-                            SizedBox(width: 10),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Row(
+                          children: [
                             Expanded(
                               child: _GradeCard(
                                 grade: 'C',
                                 label: 'Kurang layak',
                                 color: Color(0xFFC94343),
+                                emoji: '🍌',
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: _GradeCard(
+                                grade: 'D',
+                                label: 'Tidak layak',
+                                color: Color(0xFF7A2E2E),
                                 emoji: '🍌',
                               ),
                             ),
@@ -312,7 +325,7 @@ class _GradeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 5),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
           child: Column(
             children: [
               Text(emoji, style: const TextStyle(fontSize: 27)),
@@ -325,7 +338,7 @@ class _GradeCard extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.muted, fontSize: 10),
+                style: const TextStyle(color: AppColors.muted, fontSize: 11),
               ),
             ],
           ),
